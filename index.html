@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>上传图片</title>
+<!-- 这里自行引入 -->
+    <script src="src/js/jquery.min.js"></script>
+    <script src="src/js/lrz.bundle.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .container-fluid {
+            width: 100%;
+        }
+        .image {
+            width: 100%;
+            font-size: 20px;
+            text-align: center;
+        }
+        .imagebox {
+            width: 80%;
+            height: 200px;
+            margin: 0 auto;
+            border: 1px solid #cccccc;
+            text-align: center;
+        }
+        .image {
+            height: 200px;
+            max-width: 80%;
+            max-height: 200px;
+        }
+        .uploadWrap {
+            width: 100px;
+            height: 40px;
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+            background-color: #cccccc;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .uploadWrap span {
+            font-size: 20px;
+            color: #333333;
+            line-height: 40px;
+        }
+        #uploadfile {
+            position: absolute;
+            width: 100px;
+            height: 40px;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            opacity: 0;
+        }
+        .submit {
+            width: 80%;
+            height: 40px;
+            background-color: #cccccc;
+            border: none;
+            outline: none;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <form>
+            <div class="form-group">
+                <label>图片上传</label>
+                <div class="imagebox">
+                </div>
+                <div class="uploadWrap">
+                    <span>请选择图片</span>
+                    <input id="uploadfile" name="image" type="file"  capture="camera" accept="image/*" value="选择图片">
+                </div>
+            </div>
+            <button class="submit">提交</button>
+        </form>
+    </div>
+
+    <script>
+        $(function () {
+            var imgbase64 = '';
+            // 图片压缩预览
+            $('#uploadfile').on('change', function () {
+                console.log(this.files[0])
+                lrz(this.files[0], { width: 500  })
+                    .then(function (rst) {
+                        // 处理成功会执行
+                        console.log(rst);
+                        imgbase64 = rst.base64;
+                        var img = new Image();
+                        img.src = imgbase64;
+                        if(!!$('.imagebox').find('img')){
+                            $('.imagebox').find('img').remove('img');
+                        }
+                        $('.imagebox').append($(img))
+                        $('img').addClass('image')
+                    })
+                    .catch(function (err) {
+                        // 处理失败会执行
+                    })
+                    .always(function () {
+                        // 不管是成功失败，都会执行
+                    });
+            })
+
+            // 提交按钮点击事件
+            $('.submit').on('click', function () {
+
+                var formData = new FormData();
+                formData.append('image', imgbase64);
+                // 如果还有其他参数，可以依次append 到 formdata 对象里，
+                // formData.append('username', username);
+                // formData.append('age',age)
+                // console.log(formData)  //  这里打印的话会发现formData 对象为空，但是不要在意，这些数据确实都在formData 对象里
+                $.ajax({
+                    type: 'POST',
+                    url: '/apis/customer/add',
+                    data: formData,
+                    async: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data)
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>
