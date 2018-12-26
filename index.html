@@ -98,7 +98,7 @@
             // 图片压缩预览
             $('#uploadfile').on('change', function () {
                 console.log(this.files[0])
-                lrz(this.files[0], { width: 500  })
+                lrz(this.files[0], { width: 1000  })
                     .then(function (rst) {
                         // 处理成功会执行
                         console.log(rst);
